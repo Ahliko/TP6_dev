@@ -37,6 +37,7 @@ class Server:
                     1024)
             client = writer.get_extra_info('peername')
             if data == b'':
+                print(f"Client {self.__clients[client]['pseudo']} disconnected")
                 break
             message = data.decode()
             print(
