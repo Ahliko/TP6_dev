@@ -54,6 +54,7 @@ class Server:
                         await self.__clients[client]["w"].drain()
                 else:
                     try:
+                        print(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
                         await self.__clients[client]["w"].write(
                         f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                     except Exception as e:

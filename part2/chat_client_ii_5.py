@@ -45,7 +45,6 @@ class Client:
                                        self.__async_receive()])
         except KeyboardInterrupt:
             print("Bye!")
-        finally:
             self.__writer.close()
             await self.__writer.wait_closed()
             exit(0)
