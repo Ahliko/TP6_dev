@@ -30,17 +30,17 @@ class Client:
             print("Pseudo cannot be empty.")
             return False
         self.__pseudo = input_coro
-        self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
+        # self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
         self.__writer.write(f"Hello|{self.__pseudo}".encode())
         await self.__writer.drain()
         return True
 
     async def run(self):
         try:
+            self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
             if not await self.__async_pseudo():
                 return
             while True:
-                self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
                 await asyncio.gather(*[self.__async_input(),
                                        self.__async_receive()])
         except KeyboardInterrupt:
