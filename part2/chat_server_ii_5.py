@@ -52,12 +52,12 @@ class Server:
             else:
                 if not annonce:
                     if client != localclient:
-                        await self.__clients[client]["w"].write(
+                        self.__clients[client]["w"].write(
                             f"{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
                         await self.__clients[client]["w"].drain()
                 else:
                     print(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
-                    await self.__clients[client]["w"].write(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
+                    self.__clients[client]["w"].write(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                     await self.__clients[client]["w"].drain()
 
 
