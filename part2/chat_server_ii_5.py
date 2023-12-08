@@ -57,8 +57,7 @@ class Server:
                         await self.__clients[client]["w"].drain()
                 else:
                     print(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
-                    await self.__clients[client]["w"].write(
-                    f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
+                    await self.__clients[client]["w"].write(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                     await self.__clients[client]["w"].drain()
 
 
