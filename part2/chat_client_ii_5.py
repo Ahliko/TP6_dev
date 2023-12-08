@@ -13,36 +13,36 @@ class Client:
         asyncio.run(self.run())
 
     async def __async_input(self):
-        input_coro = await aioconsole.ainput("Enter your message: ")
-        self.__writer.write(input_coro.encode())
-        await self.__writer.drain()
+        while True:
+            input_coro = await aioconsole.ainput("Enter your message: ")
+            self.__writer.write(input_coro.encode())
+            await self.__writer.drain()
 
     async def __async_receive(self):
-        data = await self.__reader.read(1024)
-        if data == b'':
-            return
-        message = data.decode()
-        print(f"Received {message!r}")
+        while True:
+            data = await self.__reader.read(1024)
+            if data == b'':
+                return
+            message = data.decode()
+            print(f"Received {message!r}")
 
     async def __async_pseudo(self):
         input_coro = await aioconsole.ainput("Enter your pseudo: ")
-        self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
         if input_coro == "":
             print("Pseudo cannot be empty.")
             return False
         self.__pseudo = input_coro
-        # self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
         self.__writer.write(f"Hello|{self.__pseudo}".encode())
         await self.__writer.drain()
         return True
 
     async def run(self):
         try:
-            if not await self.__async_pseudo():
-                return
-            while True:
-                await asyncio.gather(*[self.__async_input(),
-                                       self.__async_receive()])
+            self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
+            if await self.__async_pseudo():
+                while True:
+                    await asyncio.gather(*[self.__async_input(),
+                                           self.__async_receive()])
         except KeyboardInterrupt:
             print("Bye!")
             self.__writer.close()
