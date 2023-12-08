@@ -43,11 +43,11 @@ class Client:
                 self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
                 await asyncio.gather(*[self.__async_input(),
                                        self.__async_receive()])
-                self.__writer.close()
-                await self.__writer.wait_closed()
-
         except KeyboardInterrupt:
             print("Bye!")
+        finally:
+            self.__writer.close()
+            await self.__writer.wait_closed()
             exit(0)
 
 
