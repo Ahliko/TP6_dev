@@ -37,8 +37,8 @@ class Client:
                 message = data.decode()
                 if message.startswith("Annonce : "):
                     print(colored.stylize(message, colored.fg("red")))
-                elif len(message.split("\033")) == 2:
-                    print(colored.stylize(message.split("\033")[1], colored.fg(message.split("\033")[0])))
+                elif len(message.split("\x1b")) == 2:
+                    print(colored.stylize(message.split("\x1b")[1], colored.fg(message.split("\x1b")[0])))
                 print(f"Received {message!r}")
             except KeyboardInterrupt:
                 print("Bye!")
