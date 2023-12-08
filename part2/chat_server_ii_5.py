@@ -25,6 +25,7 @@ class Server:
                     await self.__send_all("", client, True)
                 await writer.drain()
         else:
+            print("test")
             self.__clients[writer.get_extra_info('peername')]["r"] = reader
             self.__clients[writer.get_extra_info('peername')]["w"] = writer
         while True:
