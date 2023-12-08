@@ -30,6 +30,7 @@ class Client:
             print("Pseudo cannot be empty.")
             return False
         self.__pseudo = input_coro
+        self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
         self.__writer.write(f"Hello|{self.__pseudo}".encode())
         await self.__writer.drain()
         return True
