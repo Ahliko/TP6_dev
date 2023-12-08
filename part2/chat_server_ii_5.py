@@ -11,7 +11,6 @@ class Server:
 
     async def __handle_client_msg(self, reader, writer):
         if writer.get_extra_info('peername') not in self.__clients:
-            print("ouiiiiiiiii\n")
             data = await reader.read(1024)
             if data == b'':
                 writer.write("You must choose un nametag".encode())
@@ -43,8 +42,7 @@ class Server:
 
     async def __send_all(self, message, localclient, annonce=False):
         for client in self.__clients:
-            print(client)
-            if client["w"] is None:
+            if self.__clients[client]["w"] is None:
                 self.__clients.pop(client)
             else:
                 if not annonce:
