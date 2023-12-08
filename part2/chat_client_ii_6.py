@@ -30,7 +30,9 @@ class Client:
             try:
                 data = await self.__reader.read(1024)
                 if data == b'':
-                    return
+                    print("Server disconnected")
+                    self.__writer.close()
+                    exit(0)
                 message = data.decode()
                 print(f"Received {message!r}")
             except KeyboardInterrupt:
