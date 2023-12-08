@@ -11,6 +11,7 @@ class Server:
 
     async def __handle_client_msg(self, reader, writer):
         if writer.get_extra_info('peername') not in self.__clients:
+            print("ouiiiiiiiii\n")
             data = await reader.read(1024)
             if data == b'':
                 writer.write("You must choose un nametag".encode())
