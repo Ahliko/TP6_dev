@@ -45,6 +45,7 @@ class Server:
     async def __send_all(self, message, localclient, annonce=False):
         for client in self.__clients:
             if self.__clients[client]["w"] is None:
+                print(f"Client {self.__clients[client]['pseudo']} disconnected")
                 self.__clients.pop(client)
             else:
                 if not annonce:
