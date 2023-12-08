@@ -25,12 +25,11 @@ class Server:
                     await self.__send_all("", client, True)
                 await writer.drain()
         else:
-            print("test")
             self.__clients[writer.get_extra_info('peername')]["r"] = reader
             self.__clients[writer.get_extra_info('peername')]["w"] = writer
         while True:
             data = await \
-                self.__clients[self.__clients[writer.get_extra_info('peername')]["w"].get_extra_info('peername')][
+                self.__clients[writer.get_extra_info('peername')][
                     "r"].read(
                     1024)
             client = writer.get_extra_info('peername')
