@@ -39,7 +39,7 @@ class Client:
             if not await self.__async_pseudo():
                 return
             while True:
-                self.__reader, self.__writer = await asyncio.open_connection(host="127.0.0.1", port=8888)
+                self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
                 await asyncio.gather(*[self.__async_input(),
                                        self.__async_receive()])
                 self.__writer.close()

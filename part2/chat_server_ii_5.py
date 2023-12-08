@@ -56,7 +56,7 @@ class Server:
                     await self.__clients[client]["w"].drain()
 
     async def run(self):
-        server = await asyncio.start_server(self.__handle_client_msg, '0.0.0.0', 8888)
+        server = await asyncio.start_server(self.__handle_client_msg, self.__host, self.__port)
         addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
         print(f'Serving on {addrs}')
         async with server:
