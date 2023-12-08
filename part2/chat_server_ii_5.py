@@ -56,13 +56,9 @@ class Server:
                             f"{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
                         await self.__clients[client]["w"].drain()
                 else:
-                    try:
-                        print(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
-                        await self.__clients[client]["w"].write(
-                        f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
-                    except Exception as e:
-                        print(f"Error : {e}")
-                        pass
+                    print(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
+                    await self.__clients[client]["w"].write(
+                    f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                     await self.__clients[client]["w"].drain()
 
 
