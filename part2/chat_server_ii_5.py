@@ -42,7 +42,6 @@ class Server:
 
     async def __send_all(self, message, localclient, annonce=False):
         for client in self.__clients:
-            print(self.__clients[client]["w"])
             if self.__clients[client]["w"] is None:
                 self.__clients.pop(client)
             else:
@@ -52,6 +51,7 @@ class Server:
                             f"{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
                         await self.__clients[client]["w"].drain()
                 else:
+                    print(self.__clients[client]["w"])
                     await self.__clients[client]["w"].write(
                         f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                     await self.__clients[client]["w"].drain()
