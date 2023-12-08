@@ -27,11 +27,18 @@ class Client:
 
     async def __async_receive(self):
         while True:
-            data = await self.__reader.read(1024)
-            if data == b'':
-                return
-            message = data.decode()
-            print(f"Received {message!r}")
+            try:
+                data = await self.__reader.read(1024)
+                if data == b'':
+                    return
+                message = data.decode()
+                print(f"Received {message!r}")
+            except KeyboardInterrupt:
+                print("Bye!")
+                self.__writer.write("".encode())
+                self.__writer.close()
+                await self.__writer.wait_closed()
+                exit(0)
 
     async def __async_pseudo(self):
         input_coro = await aioconsole.ainput("Enter your pseudo: ")

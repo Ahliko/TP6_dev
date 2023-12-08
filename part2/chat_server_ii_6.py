@@ -42,6 +42,7 @@ class Server:
                 self.__clients[client]["here"] = False
                 self.__clients[client]["w"].close()
                 self.__clients[client]["w"] = None
+                print(f"Client {self.__clients[client]['pseudo']} disconnected")
                 await self.__send_all("", client, disconnect=True)
                 break
             message = data.decode()
