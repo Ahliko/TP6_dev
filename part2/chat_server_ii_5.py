@@ -58,10 +58,10 @@ class Server:
                 else:
                     print(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
 
-                    self.__clients[client]["w"].write(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
+                    self.__clients[client]["w"].write(
+                        f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                     print(client)
                     await self.__clients[client]["w"].drain()
-
 
     async def run(self):
         server = await asyncio.start_server(self.__handle_client_msg, self.__host, self.__port)
