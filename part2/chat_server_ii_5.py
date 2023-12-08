@@ -21,8 +21,7 @@ class Server:
                 self.__clients[writer.get_extra_info('peername')]["r"] = reader
                 self.__clients[writer.get_extra_info('peername')]["w"] = writer
                 self.__clients[writer.get_extra_info('peername')]['pseudo'] = data.decode()[6:]
-                for client in self.__clients:
-                    await self.__send_all("", client, True)
+                await self.__send_all("", self.__clients[writer.get_extra_info('peername')], True)
             else:
                 writer.write("You must choose un nametag".encode())
                 writer.close()
