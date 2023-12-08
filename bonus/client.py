@@ -1,6 +1,7 @@
 import asyncio
 import aioconsole
 import argparse
+import colored
 
 
 class Client:

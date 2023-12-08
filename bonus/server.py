@@ -1,5 +1,6 @@
 import asyncio
 import os
+from random import randint
 
 from dotenv import load_dotenv
 
@@ -24,6 +25,7 @@ class Server:
                 self.__clients[writer.get_extra_info('peername')]["r"] = reader
                 self.__clients[writer.get_extra_info('peername')]["w"] = writer
                 self.__clients[writer.get_extra_info('peername')]["here"] = True
+                self.__clients[writer.get_extra_info('peername')]["color"] = randint(0, 255)
                 self.__clients[writer.get_extra_info('peername')]['pseudo'] = data.decode()[6:]
                 await self.__send_all("", writer.get_extra_info('peername'), True)
             else:
@@ -64,7 +66,12 @@ class Server:
                             await self.__clients[client]["w"].drain()
                         else:
                             self.__clients[client]["w"].write(
-                                f"{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
+                                f"\033{self.__clients[localclient]['color']}m{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
+                            await self.__clients[client]["w"].drain()
+                    else:
+                        if not disconnect:
+                            self.__clients[client]["w"].write(
+                                f"Vous avez dit : {message}".encode())
                             await self.__clients[client]["w"].drain()
                 else:
                     print(f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
