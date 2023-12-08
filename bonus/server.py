@@ -66,7 +66,7 @@ class Server:
                             await self.__clients[client]["w"].drain()
                         else:
                             self.__clients[client]["w"].write(
-                                f"\033{self.__clients[localclient]['color']}m{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
+                                f"\033{self.__clients[localclient]['color']}\033{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
                             await self.__clients[client]["w"].drain()
                     else:
                         if not disconnect:

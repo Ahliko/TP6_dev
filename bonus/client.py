@@ -35,6 +35,10 @@ class Client:
                     self.__writer.close()
                     exit(0)
                 message = data.decode()
+                if message.startswith("Annonce : "):
+                    print(colored.stylize(message, colored.fg("red")))
+                elif len(message.split("\033")) == 2:
+                    print(colored.stylize(message.split("\033")[1], colored.fg(message.split("\033")[0])))
                 print(f"Received {message!r}")
             except KeyboardInterrupt:
                 print("Bye!")
