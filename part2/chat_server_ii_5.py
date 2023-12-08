@@ -55,7 +55,7 @@ class Server:
                         f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                     await self.__clients[client]["w"].drain()
 
-    async def main(self):
+    async def run(self):
         server = await asyncio.start_server(self.__handle_client_msg, '0.0.0.0', 8888)
         addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
         print(f'Serving on {addrs}')
