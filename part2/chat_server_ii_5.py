@@ -3,7 +3,7 @@ import asyncio
 
 
 class Server:
-    def __init__(self, host, port):
+    def __init__(self, host="127.0.0.1", port=8888):
         self.__host = host
         self.__port = port
         self.__clients = {}
