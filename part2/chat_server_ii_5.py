@@ -55,12 +55,11 @@ class Server:
                                 f"{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
                             await self.__clients[client]["w"].drain()
                     else:
-                        print(self.__clients[client]["w"])
                         await self.__clients[client]["w"].write(
                             f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                         await self.__clients[client]["w"].drain()
-                except TypeError:
-                    print("TypeError")
+                except Exception as e:
+                    print(e)
                     pass
 
     async def run(self):
