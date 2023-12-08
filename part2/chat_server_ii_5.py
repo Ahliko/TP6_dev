@@ -48,19 +48,20 @@ class Server:
             if self.__clients[client]["w"] is None:
                 self.__clients.pop(client)
             else:
-                try:
-                    if not annonce:
-                        if client != localclient:
-                            await self.__clients[client]["w"].write(
-                                f"{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
-                            await self.__clients[client]["w"].drain()
-                    else:
+                if not annonce:
+                    if client != localclient:
                         await self.__clients[client]["w"].write(
-                            f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
+                            f"{self.__clients[localclient]['pseudo']} a dit : {message}".encode())
                         await self.__clients[client]["w"].drain()
-                except Exception as e:
-                    print(e)
-                    pass
+                else:
+                    try:
+                        await self.__clients[client]["w"].write(
+                        f"Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
+                    except Exception as e:
+                        print(e)
+                        pass
+                    await self.__clients[client]["w"].drain()
+
 
     async def run(self):
         server = await asyncio.start_server(self.__handle_client_msg, self.__host, self.__port)
