@@ -11,6 +11,7 @@ class Server:
 
     async def __handle_client_msg(self, reader, writer):
         print(f"New client : {writer.get_extra_info('peername')[0]}:{writer.get_extra_info('peername')[1]}")
+        print(self.__clients)
         if writer.get_extra_info('peername')[0] not in self.__clients:
             data = await reader.read(1024)
             if data == b'':
