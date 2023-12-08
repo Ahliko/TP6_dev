@@ -182,6 +182,22 @@ python part2/chat_client_ii_6.py -p <PORT> -a <HOST>
 
 ## 1. Basic Cosmetic
 
+[chat_server_iii_1.py](bonus/server.py)
+
+```bash
+pip install aioconsole
+pip install python-dotenv
+python bonus/server.py
+```
+
+[chat_client_iii_1.py](bonus/client.py)
+
+```bash
+python bonus/client.py
+```
+
+
+
 Parlons un peu cosmétique côté client.
 
 ➜ **`Vous avez dit`**
