@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import os
 import time
 from random import randint
@@ -51,7 +52,7 @@ class Server:
                 await self.__send_all("", client, disconnect=True)
                 break
             message = data.decode()
-            self.__clients[client]["timestamp"] = time.time()
+            self.__clients[client]["timestamp"] = f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]"
             print(
                 f"Message received from {self.__clients[client]['w'].get_extra_info('peername')[0]}:{self.__clients[client]['w'].get_extra_info('peername')[1]} : {message!r}")
             await self.__send_all(message, client)
@@ -68,7 +69,7 @@ class Server:
                             await self.__clients[client]["w"].drain()
                         else:
                             self.__clients[client]["w"].write(
-                                f"[{self.__clients[localclient]['timestamp']}]\033{self.__clients[localclient]['color']}\033{self.__clients[localclient]['pseudo']}\033 a dit : {message}".encode())
+                                f"{self.__clients[localclient]['timestamp']}\033{self.__clients[localclient]['color']}\033{self.__clients[localclient]['pseudo']}\033 a dit : {message}".encode())
                             await self.__clients[client]["w"].drain()
                     else:
                         if not disconnect:
