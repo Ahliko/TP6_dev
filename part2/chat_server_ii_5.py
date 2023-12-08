@@ -10,6 +10,7 @@ class Server:
         asyncio.run(self.run())
 
     async def __handle_client_msg(self, reader, writer):
+        print(f"New client : {writer.get_extra_info('peername')}")
         if writer.get_extra_info('peername') not in self.__clients:
             data = await reader.read(1024)
             if data == b'':

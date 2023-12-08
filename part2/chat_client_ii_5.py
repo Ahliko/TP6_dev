@@ -26,6 +26,7 @@ class Client:
 
     async def __async_pseudo(self):
         input_coro = await aioconsole.ainput("Enter your pseudo: ")
+        self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
         if input_coro == "":
             print("Pseudo cannot be empty.")
             return False
@@ -37,7 +38,6 @@ class Client:
 
     async def run(self):
         try:
-            self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
             if not await self.__async_pseudo():
                 return
             while True:
