@@ -43,6 +43,7 @@ class Server:
             await self.__send_all(message, client)
 
     async def __send_all(self, message, localclient, annonce=False):
+        print(self.__clients)
         for client in self.__clients:
             if self.__clients[client]["w"] is None:
                 print(f"Client {self.__clients[client]['pseudo']} disconnected")
