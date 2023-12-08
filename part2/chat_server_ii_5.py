@@ -11,17 +11,17 @@ class Server:
 
     async def __handle_client_msg(self, reader, writer):
         print(f"New client : {writer.get_extra_info('peername')[0]}:{writer.get_extra_info('peername')[1]}")
-        if writer.get_extra_info('peername') not in self.__clients:
+        if writer.get_extra_info('peername')[0] not in self.__clients:
             data = await reader.read(1024)
             if data == b'':
                 writer.write("You must choose un nametag".encode())
                 writer.close()
                 return
             if data.decode().startswith("Hello|"):
-                self.__clients[writer.get_extra_info('peername')] = {}
-                self.__clients[writer.get_extra_info('peername')]["r"] = reader
-                self.__clients[writer.get_extra_info('peername')]["w"] = writer
-                self.__clients[writer.get_extra_info('peername')]['pseudo'] = data.decode()[6:]
+                self.__clients[writer.get_extra_info('peername')[0]] = {}
+                self.__clients[writer.get_extra_info('peername')[0]]["r"] = reader
+                self.__clients[writer.get_extra_info('peername')[0]]["w"] = writer
+                self.__clients[writer.get_extra_info('peername')[0]]['pseudo'] = data.decode()[6:]
                 for client in self.__clients:
                     await self.__send_all("", client, True)
             else:
@@ -29,14 +29,14 @@ class Server:
                 writer.close()
                 return
         else:
-            self.__clients[writer.get_extra_info('peername')]["r"] = reader
-            self.__clients[writer.get_extra_info('peername')]["w"] = writer
+            self.__clients[writer.get_extra_info('peername')[0]]["r"] = reader
+            self.__clients[writer.get_extra_info('peername')[0]]["w"] = writer
         while True:
             data = await \
-                self.__clients[writer.get_extra_info('peername')][
+                self.__clients[writer.get_extra_info('peername')[0]][
                     "r"].read(
                     1024)
-            client = writer.get_extra_info('peername')
+            client = writer.get_extra_info('peername')[0]
             if data == b'':
                 break
             message = data.decode()
