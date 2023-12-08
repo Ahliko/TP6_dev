@@ -38,10 +38,10 @@ class Client:
                 if message.startswith("Annonce : "):
                     print(colored.stylize(message, colored.fg("red")))
                 elif len(message.split("\x1b")) == 4:
-                    print(message.split("\x1b")[0], colored.stylize(message.split("\x1b")[2], colored.fg(message.split("\x1b")[1])) +
+                    print("\n" + message.split("\x1b")[0], colored.stylize(message.split("\x1b")[2], colored.fg(message.split("\x1b")[1])) +
                            colored.stylize(message.split("\x1b")[3], colored.fg(15)))
-                else:
-                    print(message)
+                elif len(message.split("\x1b")) == 2:
+                    print("\n" + message.split("\x1b")[0], colored.stylize(message.split("\x1b")[1], colored.fg(15)))
             except KeyboardInterrupt:
                 print("Bye!")
                 self.__writer.write("".encode())

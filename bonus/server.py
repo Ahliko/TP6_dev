@@ -63,9 +63,9 @@ class Server:
                 if not annonce:
                     if client != localclient:
                         if disconnect:
-                            print(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}] Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom")
+                            print(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom")
                             self.__clients[client]["w"].write(
-                                f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}] Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom".encode())
+                                f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom".encode())
                             await self.__clients[client]["w"].drain()
                         else:
                             self.__clients[client]["w"].write(
@@ -74,13 +74,13 @@ class Server:
                     else:
                         if not disconnect:
                             self.__clients[client]["w"].write(
-                                f"{self.__clients[localclient]['timestamp']} Vous avez dit : {message}".encode())
+                                f"{self.__clients[localclient]['timestamp']}\033Vous avez dit : {message}".encode())
                             await self.__clients[client]["w"].drain()
                 else:
-                    print(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}] Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
+                    print(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
 
                     self.__clients[client]["w"].write(
-                        f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}] Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
+                        f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                     print(client)
                     await self.__clients[client]["w"].drain()
         if disconnect:
