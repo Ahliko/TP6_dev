@@ -40,7 +40,7 @@ class Server:
                 await self.__send(id)
                 await self.__send_all("", id, True)
             elif data.decode().split('ID|')[1] in self.__clients:
-                id = data.decode()
+                id = data.decode().split('ID|')[1]
                 self.__clients[id]["r"] = reader
                 self.__clients[id]["w"] = writer
                 self.__clients[id]["here"] = True
