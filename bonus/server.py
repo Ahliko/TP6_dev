@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import os
 import time
+import uuid
 from random import randint
 
 from dotenv import load_dotenv
@@ -14,36 +15,55 @@ class Server:
         self.__clients = {}
         asyncio.run(self.run())
 
+    @staticmethod
+    def generate_uuid():
+        return uuid.uuid4()
+
     async def __handle_client_msg(self, reader, writer):
         print(f"New client : {writer.get_extra_info('peername')}")
-        if writer.get_extra_info('peername') not in self.__clients:
+        if writer.get_extra_info('peername') not in [i["addr"] for i in self.__clients.values()]:
             data = await reader.read(1024)
             if data == b'':
                 writer.write("You must choose un nametag".encode())
                 writer.close()
                 return
-            if data.decode().startswith("Hello|"):
-                self.__clients[writer.get_extra_info('peername')] = {}
-                self.__clients[writer.get_extra_info('peername')]["r"] = reader
-                self.__clients[writer.get_extra_info('peername')]["w"] = writer
-                self.__clients[writer.get_extra_info('peername')]["here"] = True
-                self.__clients[writer.get_extra_info('peername')]["color"] = randint(0, 255)
-                self.__clients[writer.get_extra_info('peername')]['pseudo'] = data.decode()[6:]
-                await self.__send_all("", writer.get_extra_info('peername'), True)
+            elif data.decode().startswith("Hello|"):
+                id = self.generate_uuid()
+                self.__clients[id] = {}
+                self.__clients[id]["r"] = reader
+                self.__clients[id]["w"] = writer
+                self.__clients[id]["here"] = True
+                self.__clients[id]["color"] = randint(0, 255)
+                self.__clients[id]['pseudo'] = data.decode()[6:]
+                self.__clients[id]["addr"] = writer.get_extra_info('peername')
+                await self.__send_all("", id, True)
+            elif data.decode() in self.__clients:
+                id = data.decode()
+                self.__clients[id]["r"] = reader
+                self.__clients[id]["w"] = writer
+                self.__clients[id]["here"] = True
+                self.__clients[id]["addr"] = writer.get_extra_info('peername')
             else:
                 writer.write("You must choose un nametag".encode())
                 writer.close()
                 return
         else:
-            self.__clients[writer.get_extra_info('peername')]["r"] = reader
-            self.__clients[writer.get_extra_info('peername')]["w"] = writer
-            self.__clients[writer.get_extra_info('peername')]["here"] = True
+            id = await reader.read(1024).decode()
+            if id in self.__clients:
+                self.__clients[id]["r"] = reader
+                self.__clients[id]["w"] = writer
+                self.__clients[id]["here"] = True
+                self.__clients[id]["addr"] = writer.get_extra_info('peername')
+            else:
+                writer.write("Connection rejected".encode())
+                writer.close()
+                return
         while True:
             data = await \
-                self.__clients[writer.get_extra_info('peername')][
+                self.__clients[id][
                     "r"].read(
                     1024)
-            client = writer.get_extra_info('peername')
+            client = id
             if data == b'':
                 self.__clients[client]["here"] = False
                 self.__clients[client]["w"].close()
@@ -54,7 +74,7 @@ class Server:
             message = data.decode()
             self.__clients[client]["timestamp"] = f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]"
             print(
-                f"Message received from {self.__clients[client]['w'].get_extra_info('peername')[0]}:{self.__clients[client]['w'].get_extra_info('peername')[1]} : {message!r}")
+                f"Message received from {self.__clients[client]['addr'][0]}:{self.__clients[client]['addr'][1]} : {message!r}")
             await self.__send_all(message, client)
 
     async def __send_all(self, message, localclient, annonce=False, disconnect=False):
