@@ -44,6 +44,7 @@ class Server:
                 self.__clients[id]["w"] = writer
                 self.__clients[id]["here"] = True
                 self.__clients[id]["addr"] = writer.get_extra_info('peername')
+                await self.__send_all("", id, reconnect=True)
             else:
                 writer.write("You must choose un nametag".encode())
                 writer.close()
@@ -73,7 +74,8 @@ class Server:
                 await self.__send_all("", client, disconnect=True)
                 break
             message = data.decode()
-            self.__clients[client]["timestamp"] = f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]"
+            self.__clients[client][
+                "timestamp"] = f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]"
             print(
                 f"Message received from {self.__clients[client]['addr'][0]}:{self.__clients[client]['addr'][1]} : {message!r}")
             await self.__send_all(message, client)
@@ -82,15 +84,22 @@ class Server:
         self.__clients[id]["w"].write(f"ID|{id}".encode())
         await self.__clients[id]["w"].drain()
 
-    async def __send_all(self, message, localclient, annonce=False, disconnect=False):
+    async def __send_all(self, message, localclient, annonce=False, disconnect=False, reconnect=False):
         for client in self.__clients:
             if self.__clients[client]["here"]:
                 if not annonce:
                     if client != localclient:
                         if disconnect:
-                            print(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom")
+                            print(
+                                f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom")
                             self.__clients[client]["w"].write(
                                 f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom".encode())
+                            await self.__clients[client]["w"].drain()
+                        elif reconnect:
+                            print(
+                                f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} est de retour !")
+                            self.__clients[client]["w"].write(
+                                f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} est de retour !".encode())
                             await self.__clients[client]["w"].drain()
                         else:
                             self.__clients[client]["w"].write(
@@ -101,8 +110,13 @@ class Server:
                             self.__clients[client]["w"].write(
                                 f"{self.__clients[localclient]['timestamp']}\033Vous avez dit : {message}".encode())
                             await self.__clients[client]["w"].drain()
+                        elif reconnect:
+                            self.__clients[client]["w"].write(
+                                f"{self.__clients[localclient]['timestamp']}\033Welcome back  !".encode())
+                            await self.__clients[client]["w"].drain()
                 else:
-                    print(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
+                    print(
+                        f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
 
                     self.__clients[client]["w"].write(
                         f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())

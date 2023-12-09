@@ -1,5 +1,6 @@
 import asyncio
 import os.path
+import sys
 
 import aioconsole
 import argparse
@@ -16,7 +17,7 @@ class Client:
         self.__pseudo = None
         self.__reader = None
         self.__writer = None
-        self.__link = "bonus/info.json"
+        self.__link = f"{os.path.abspath(os.path.curdir)}/info.json"
         self.__data = {}
         asyncio.run(self.run())
 
