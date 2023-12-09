@@ -26,7 +26,8 @@ class Server:
             data = await reader.read(1024)
             print(data.decode())
             print(self.__clients)
-            print(data.decode().split("ID|")[1] in self.__clients)
+            if data.decode().startswith("ID|"):
+                print(data.decode().split("ID|")[1] in self.__clients)
             if data == b'':
                 print("1")
                 writer.write("You must choose un nametag".encode())
