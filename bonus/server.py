@@ -136,8 +136,6 @@ class Server:
                         f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
                     print(client)
                     await self.__clients[client]["w"].drain()
-        if disconnect:
-            self.__clients.pop(localclient)
 
     async def run(self):
         server = await asyncio.start_server(self.__handle_client_msg, self.__host, self.__port)
