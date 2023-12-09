@@ -79,6 +79,7 @@ class Server:
                 await self.__send_all("", client, disconnect=True)
                 break
             message = data.decode()
+            print('ici2')
             self.__clients[client][
                 "timestamp"] = f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]"
             print(
