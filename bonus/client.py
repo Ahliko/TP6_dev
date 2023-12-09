@@ -103,13 +103,28 @@ class Client:
         try:
             if os.path.exists(self.__link):
                 self.__data = await self.read_content(self.__link)
-                print(self.__data)
+                self.__data = self.unjson(self.__data)
+                self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
+                if await self.__async_id():
+                    while True:
+                        await asyncio.gather(*[self.__async_input(),
+                                               self.__async_receive()])
+                else:
+                    print("Connection rejected")
+                    self.__writer.close()
+                    await self.__writer.wait_closed()
+                    exit(1)
             else:
                 self.__reader, self.__writer = await asyncio.open_connection(host=self.__host, port=self.__port)
                 if await self.__async_pseudo():
                     while True:
                         await asyncio.gather(*[self.__async_input(),
                                                self.__async_receive()])
+                else:
+                    print("Connection rejected")
+                    self.__writer.close()
+                    await self.__writer.wait_closed()
+                    exit(1)
         except KeyboardInterrupt:
             print("Bye!")
             self.__writer.close()

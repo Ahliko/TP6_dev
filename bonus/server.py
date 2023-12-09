@@ -44,6 +44,7 @@ class Server:
                 self.__clients[id]["w"] = writer
                 self.__clients[id]["here"] = True
                 self.__clients[id]["addr"] = writer.get_extra_info('peername')
+                await self.__send(id, accept=True)
                 await self.__send_all("", id, reconnect=True)
             else:
                 writer.write("You must choose un nametag".encode())
@@ -56,6 +57,7 @@ class Server:
                 self.__clients[id]["w"] = writer
                 self.__clients[id]["here"] = True
                 self.__clients[id]["addr"] = writer.get_extra_info('peername')
+                await self.__send(id, accept=True)
             else:
                 writer.write("Connection rejected".encode())
                 writer.close()
@@ -80,8 +82,11 @@ class Server:
                 f"Message received from {self.__clients[client]['addr'][0]}:{self.__clients[client]['addr'][1]} : {message!r}")
             await self.__send_all(message, client)
 
-    async def __send(self, id):
-        self.__clients[id]["w"].write(f"ID|{id}".encode())
+    async def __send(self, id, accept=False):
+        if accept:
+            self.__clients[id]["w"].write("200".encode())
+        else:
+            self.__clients[id]["w"].write(f"ID|{id}".encode())
         await self.__clients[id]["w"].drain()
 
     async def __send_all(self, message, localclient, annonce=False, disconnect=False, reconnect=False):
