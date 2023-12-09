@@ -25,10 +25,12 @@ class Server:
             print("New client")
             data = await reader.read(1024)
             if data == b'':
+                print("1")
                 writer.write("You must choose un nametag".encode())
                 writer.close()
                 return
             elif data.decode().startswith("Hello|"):
+                print("2")
                 id = self.generate_uuid()
                 self.__clients[id] = {}
                 self.__clients[id]["r"] = reader
@@ -40,6 +42,7 @@ class Server:
                 await self.__send(id)
                 await self.__send_all("", id, True)
             elif data.decode().split('ID|')[1] in self.__clients:
+                print("3")
                 id = data.decode().split('ID|')[1]
                 self.__clients[id]["r"] = reader
                 self.__clients[id]["w"] = writer
@@ -48,12 +51,12 @@ class Server:
                 await self.__send(id, accept=True)
                 await self.__send_all("", id, reconnect=True)
             else:
+                print("4")
                 writer.write("You must choose un nametag".encode())
                 writer.close()
                 return
         else:
             id = await reader.read(1024).decode()
-            print(id)
             if id in self.__clients:
                 self.__clients[id]["r"] = reader
                 self.__clients[id]["w"] = writer
