@@ -111,6 +111,7 @@ class Client:
                                                self.__async_receive()])
                 else:
                     print("Connection rejected")
+                    os.remove(self.__link)
                     self.__writer.close()
                     await self.__writer.wait_closed()
                     exit(1)
