@@ -94,7 +94,7 @@ class Client:
     async def __async_id(self):
         self.__writer.write(f"ID|{self.__data['id']}".encode())
         await self.__writer.drain()
-        data = await self.__reader.read(1024)
+        data = await self.__reader.read(3)
         if data.decode() != "200":
             return False
         return True
