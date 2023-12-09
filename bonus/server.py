@@ -22,19 +22,12 @@ class Server:
     async def __handle_client_msg(self, reader, writer):
         print(f"New client : {writer.get_extra_info('peername')}")
         if writer.get_extra_info('peername') not in [i["addr"] for i in self.__clients.values()]:
-            print("New client")
             data = await reader.read(1024)
-            print(data.decode())
-            print(self.__clients)
-            if data.decode().startswith("ID|"):
-                print(data.decode().split("ID|")[1] in self.__clients)
             if data == b'':
-                print("1")
                 writer.write("You must choose un nametag".encode())
                 writer.close()
                 return
             elif data.decode().startswith("Hello|"):
-                print("2")
                 id = str(self.generate_uuid())
                 self.__clients[id] = {}
                 self.__clients[id]["r"] = reader
@@ -55,7 +48,6 @@ class Server:
                 await self.__send(id, accept=True)
                 await self.__send_all("", id, reconnect=True)
             else:
-                print("4")
                 writer.write("You must choose un nametag".encode())
                 writer.close()
                 return
@@ -93,6 +85,7 @@ class Server:
 
     async def __send(self, id, accept=False):
         if accept:
+            print("ici")
             self.__clients[id]["w"].write("200".encode())
         else:
             self.__clients[id]["w"].write(f"ID|{id}".encode())
