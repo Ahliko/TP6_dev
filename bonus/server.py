@@ -35,7 +35,7 @@ class Server:
                 return
             elif data.decode().startswith("Hello|"):
                 print("2")
-                id = self.generate_uuid()
+                id = str(self.generate_uuid())
                 self.__clients[id] = {}
                 self.__clients[id]["r"] = reader
                 self.__clients[id]["w"] = writer
