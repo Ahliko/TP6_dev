@@ -39,7 +39,6 @@ class Server:
                 await self.__send(id)
                 await self.__send_all("", id, True)
             elif data.decode().split('ID|')[1] in self.__clients:
-                print("3")
                 id = data.decode().split('ID|')[1]
                 self.__clients[id]["r"] = reader
                 self.__clients[id]["w"] = writer
@@ -79,7 +78,6 @@ class Server:
                 await self.__send_all("", client, disconnect=True)
                 break
             message = data.decode()
-            print('ici2')
             self.__clients[client][
                 "timestamp"] = f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]"
             print(
@@ -97,9 +95,7 @@ class Server:
         for client in self.__clients:
             if self.__clients[client]["here"]:
                 if not annonce:
-                    print("not annonce")
                     if client != localclient:
-                        print('not localclient')
                         if disconnect:
                             print(
                                 f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom")
@@ -117,12 +113,11 @@ class Server:
                                 f"{self.__clients[localclient]['timestamp']}\033{self.__clients[localclient]['color']}\033{self.__clients[localclient]['pseudo']}\033 a dit : {message}".encode())
                             await self.__clients[client]["w"].drain()
                     else:
-                        if not disconnect:
+                        if not disconnect and not reconnect:
                             self.__clients[client]["w"].write(
                                 f"{self.__clients[localclient]['timestamp']}\033Vous avez dit : {message}".encode())
                             await self.__clients[client]["w"].drain()
                         elif reconnect:
-                            print("ici")
                             self.__clients[client]["w"].write(
                                 f"{self.__clients[localclient]['timestamp']}\033Welcome back  !".encode())
                             await self.__clients[client]["w"].drain()
