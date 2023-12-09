@@ -36,6 +36,7 @@ class Server:
                 self.__clients[id]["color"] = randint(0, 255)
                 self.__clients[id]['pseudo'] = data.decode()[6:]
                 self.__clients[id]["addr"] = writer.get_extra_info('peername')
+                await self.__send(id)
                 await self.__send_all("", id, True)
             elif data.decode() in self.__clients:
                 id = data.decode()
@@ -76,6 +77,10 @@ class Server:
             print(
                 f"Message received from {self.__clients[client]['addr'][0]}:{self.__clients[client]['addr'][1]} : {message!r}")
             await self.__send_all(message, client)
+
+    async def __send(self, id):
+        self.__clients[id]["w"].write(f"ID|{id}".encode())
+        await self.__clients[id]["w"].drain()
 
     async def __send_all(self, message, localclient, annonce=False, disconnect=False):
         for client in self.__clients:
