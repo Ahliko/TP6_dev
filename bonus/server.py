@@ -95,10 +95,11 @@ class Server:
 
     async def __send_all(self, message, localclient, annonce=False, disconnect=False, reconnect=False):
         for client in self.__clients:
-            print(self.__clients[client])
             if self.__clients[client]["here"]:
                 if not annonce:
+                    print("not annonce")
                     if client != localclient:
+                        print('not localclient')
                         if disconnect:
                             print(
                                 f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom")
