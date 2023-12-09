@@ -95,6 +95,7 @@ class Server:
 
     async def __send_all(self, message, localclient, annonce=False, disconnect=False, reconnect=False):
         for client in self.__clients:
+            print(self.__clients[client])
             if self.__clients[client]["here"]:
                 if not annonce:
                     if client != localclient:
