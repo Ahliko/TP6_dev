@@ -45,6 +45,8 @@ class Server:
                 self.__clients[id]["w"] = writer
                 self.__clients[id]["here"] = True
                 self.__clients[id]["addr"] = writer.get_extra_info('peername')
+                self.__clients[id][
+                    "timestamp"] = f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]"
                 await self.__send(id, accept=True)
                 await self.__send_all("", id, reconnect=True)
             else:
