@@ -85,7 +85,9 @@ class Client:
         self.__writer.write(f"Hello|{self.__pseudo}".encode())
         await self.__writer.drain()
         data = await self.__reader.read(1024)
-        self.__data = data.decode().split("|")[1]
+        self.__data["id"] = data.decode().split("|")[1]
+        self.to_json(self.__data)
+        await self.write_content(self.to_json(self.__data), self.__link)
         return True
 
     async def __async_id(self):
