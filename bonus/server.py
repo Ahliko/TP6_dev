@@ -88,7 +88,6 @@ class Server:
 
     async def __send(self, id, accept=False):
         if accept:
-            print("ici")
             self.__clients[id]["w"].write("200".encode())
         else:
             self.__clients[id]["w"].write(f"ID|{id}".encode())
@@ -121,6 +120,7 @@ class Server:
                                 f"{self.__clients[localclient]['timestamp']}\033Vous avez dit : {message}".encode())
                             await self.__clients[client]["w"].drain()
                         elif reconnect:
+                            print("ici")
                             self.__clients[client]["w"].write(
                                 f"{self.__clients[localclient]['timestamp']}\033Welcome back  !".encode())
                             await self.__clients[client]["w"].drain()
