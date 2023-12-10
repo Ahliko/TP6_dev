@@ -84,7 +84,7 @@ class Client:
         while True:
             try:
                 input_coro = await aioconsole.ainput("Enter your message: ")
-                self.__writer.write(input_coro.encode())
+                self.__writer.write(self.encode(input_coro))
                 await self.__writer.drain()
             except KeyboardInterrupt:
                 print("Bye!")
