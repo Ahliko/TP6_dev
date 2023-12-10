@@ -35,7 +35,9 @@ class Server:
 
     async def receive(self, reader):
         len_header = self.unbinaire(await reader.read(1))
+        print(f"len_header : {len_header}")
         msg_len = self.unbinaire(await reader.read(len_header))
+        print(f"msg_len : {msg_len}")
         chunks = []
 
         bytes_received = 0
