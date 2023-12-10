@@ -53,6 +53,7 @@ class Server:
             bytes_received += len(chunk)
             fin: bytes = await reader.read(8)
             if fin.decode() != "<clafin>":
+                print(fin.decode())
                 raise RuntimeError('Invalid chunk received bro')
             else:
                 # ptit one-liner pas combliqué à comprendre pour assembler la liste en un seul message
