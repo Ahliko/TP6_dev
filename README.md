@@ -192,3 +192,4 @@ Ce qui est fait :
 - [x] Encodage maison
 - [x] Re-identification à la reconnection
 - [x] Gestion de message personnalisé
+- [x] Gestion de timestamp
