@@ -34,7 +34,9 @@ class Server:
         return len_header + header + data.encode() + seq_fin
 
     async def receive(self, reader):
-        len_header = self.unbinaire(await reader.read(1))
+        data_header = await reader.read(1)
+        print(f"data_header : {data_header}")
+        len_header = self.unbinaire(data_header)
         print(f"len_header : {len_header}")
         msg_len = self.unbinaire(await reader.read(len_header))
         print(f"msg_len : {msg_len}")
