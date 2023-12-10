@@ -19,12 +19,52 @@ class Server:
     def generate_uuid():
         return uuid.uuid4()
 
+    @staticmethod
+    def unbinaire(msg):
+        return int.from_bytes(msg, byteorder='big')
+
+    @staticmethod
+    def binaire(msg):
+        return msg.to_bytes((msg.bit_length() + 7) // 8, byteorder='big')
+
+    def encode(self, data: str):
+        header = self.binaire(len(data))
+        len_header = self.binaire(len(header))
+        seq_fin = "<clafin>".encode()
+        return len_header + header + data.encode() + seq_fin
+
+    async def receive(self, reader):
+        len_header = self.unbinaire(await reader.read(1))
+        msg_len = self.unbinaire(await reader.read(len_header))
+        chunks = []
+
+        bytes_received = 0
+        while bytes_received < msg_len:
+            # Si on reçoit + que la taille annoncée, on lit 1024 par 1024 octets
+            chunk = await reader.read(min(msg_len - bytes_received,
+                                  1024))
+            if not chunk:
+                raise RuntimeError('Invalid chunk received bro')
+
+            # on ajoute le morceau de 1024 ou moins à notre liste
+            chunks.append(chunk)
+
+            # on ajoute la quantité d'octets reçus au compteur
+            bytes_received += len(chunk)
+            fin = await reader.read(8)
+            if fin.receive() != "<clafin>":
+                raise RuntimeError('Invalid chunk received bro')
+            else:
+                # ptit one-liner pas combliqué à comprendre pour assembler la liste en un seul message
+
+                return b"".join(chunks)
+
     async def __handle_client_msg(self, reader, writer):
         print(f"New client : {writer.get_extra_info('peername')}")
         if writer.get_extra_info('peername') not in [i["addr"] for i in self.__clients.values()]:
-            data = await reader.read(1024)
+            data = await self.receive(reader)
             if data == b'':
-                writer.write("You must choose un nametag".encode())
+                writer.write(self.encode("You must choose un nametag"))
                 writer.close()
                 return
             elif data.decode().startswith("Hello|"):
@@ -49,11 +89,11 @@ class Server:
                 await self.__send(id, accept=True)
                 await self.__send_all("", id, reconnect=True)
             else:
-                writer.write("You must choose un nametag".encode())
+                writer.write(self.encode("You must choose un nametag"))
                 writer.close()
                 return
         else:
-            id = await reader.read(1024).decode()
+            id = await self.receive(reader)
             if id in self.__clients:
                 self.__clients[id]["r"] = reader
                 self.__clients[id]["w"] = writer
@@ -61,14 +101,12 @@ class Server:
                 self.__clients[id]["addr"] = writer.get_extra_info('peername')
                 await self.__send(id, accept=True)
             else:
-                writer.write("Connection rejected".encode())
+                writer.write(self.encode("Connection rejected"))
                 writer.close()
                 return
         while True:
-            data = await \
-                self.__clients[id][
-                    "r"].read(
-                    1024)
+            data = await self.receive(self.__clients[id][
+                    "r"])
             client = id
             if data == b'':
                 self.__clients[client]["here"] = False
@@ -86,9 +124,9 @@ class Server:
 
     async def __send(self, id, accept=False):
         if accept:
-            self.__clients[id]["w"].write("200".encode())
+            self.__clients[id]["w"].write(self.encode("200"))
         else:
-            self.__clients[id]["w"].write(f"ID|{id}".encode())
+            self.__clients[id]["w"].write(self.encode(f"ID|{id}"))
         await self.__clients[id]["w"].drain()
 
     async def __send_all(self, message, localclient, annonce=False, disconnect=False, reconnect=False):
@@ -100,33 +138,33 @@ class Server:
                             print(
                                 f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom")
                             self.__clients[client]["w"].write(
-                                f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom".encode())
+                                self.encode(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom"))
                             await self.__clients[client]["w"].drain()
                         elif reconnect:
                             print(
                                 f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} est de retour !")
                             self.__clients[client]["w"].write(
-                                f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} est de retour !".encode())
+                                self.encode(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} est de retour !"))
                             await self.__clients[client]["w"].drain()
                         else:
                             self.__clients[client]["w"].write(
-                                f"{self.__clients[localclient]['timestamp']}\033{self.__clients[localclient]['color']}\033{self.__clients[localclient]['pseudo']}\033 a dit : {message}".encode())
+                                self.encode(f"{self.__clients[localclient]['timestamp']}\033{self.__clients[localclient]['color']}\033{self.__clients[localclient]['pseudo']}\033 a dit : {message}"))
                             await self.__clients[client]["w"].drain()
                     else:
                         if not disconnect and not reconnect:
                             self.__clients[client]["w"].write(
-                                f"{self.__clients[localclient]['timestamp']}\033Vous avez dit : {message}".encode())
+                                self.encode(f"{self.__clients[localclient]['timestamp']}\033Vous avez dit : {message}"))
                             await self.__clients[client]["w"].drain()
                         elif reconnect:
                             self.__clients[client]["w"].write(
-                                f"{self.__clients[localclient]['timestamp']}\033Welcome back  !".encode())
+                                self.encode(f"{self.__clients[localclient]['timestamp']}\033Welcome back  !"))
                             await self.__clients[client]["w"].drain()
                 else:
                     print(
                         f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
 
                     self.__clients[client]["w"].write(
-                        f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom".encode())
+                        self.encode(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom"))
                     print(client)
                     await self.__clients[client]["w"].drain()
 

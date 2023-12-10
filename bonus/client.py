@@ -40,6 +40,46 @@ class Client:
         async with aiofiles.open(file, mode="r") as f:
             return await f.read()
 
+    @staticmethod
+    def unbinaire(msg):
+        return int.from_bytes(msg, byteorder='big')
+
+    @staticmethod
+    def binaire(msg):
+        return msg.to_bytes((msg.bit_length() + 7) // 8, byteorder='big')
+
+    def encode(self, data: str):
+        header = self.binaire(len(data))
+        len_header = self.binaire(len(header))
+        seq_fin = "<clafin>".encode()
+        return len_header + header + data.encode() + seq_fin
+
+    async def decode(self, reader):
+        len_header = self.unbinaire(await reader.read(1))
+        msg_len = self.unbinaire(await reader.read(len_header))
+        chunks = []
+
+        bytes_received = 0
+        while bytes_received < msg_len:
+            # Si on reçoit + que la taille annoncée, on lit 1024 par 1024 octets
+            chunk = await reader.read(min(msg_len - bytes_received,
+                                          1024))
+            if not chunk:
+                raise RuntimeError('Invalid chunk received bro')
+
+            # on ajoute le morceau de 1024 ou moins à notre liste
+            chunks.append(chunk)
+
+            # on ajoute la quantité d'octets reçus au compteur
+            bytes_received += len(chunk)
+            fin = await reader.read(8)
+            if fin.receive() != "<clafin>":
+                raise RuntimeError('Invalid chunk received bro')
+            else:
+                # ptit one-liner pas combliqué à comprendre pour assembler la liste en un seul message
+
+                return b"".join(chunks)
+
     async def __async_input(self):
         while True:
             try:
@@ -48,7 +88,7 @@ class Client:
                 await self.__writer.drain()
             except KeyboardInterrupt:
                 print("Bye!")
-                self.__writer.write("".encode())
+                self.__writer.write(self.encode(""))
                 self.__writer.close()
                 await self.__writer.wait_closed()
                 exit(0)
@@ -56,7 +96,7 @@ class Client:
     async def __async_receive(self):
         while True:
             try:
-                data = await self.__reader.read(1024)
+                data = await self.decode(self.__reader)
                 if data == b'':
                     print("Server disconnected")
                     self.__writer.close()
@@ -72,7 +112,7 @@ class Client:
                     print("\n" + message.split("\x1b")[0], colored.stylize(message.split("\x1b")[1], colored.fg(15)))
             except KeyboardInterrupt:
                 print("Bye!")
-                self.__writer.write("".encode())
+                self.__writer.write(self.encode(""))
                 self.__writer.close()
                 await self.__writer.wait_closed()
                 exit(0)
@@ -83,18 +123,18 @@ class Client:
             print("Pseudo cannot be empty.")
             return False
         self.__pseudo = input_coro
-        self.__writer.write(f"Hello|{self.__pseudo}".encode())
+        self.__writer.write(self.encode(f"Hello|{self.__pseudo}"))
         await self.__writer.drain()
-        data = await self.__reader.read(1024)
+        data = await self.decode(self.__reader)
         self.__data["id"] = data.decode().split("|")[1]
         self.to_json(self.__data)
         await self.write_content(self.to_json(self.__data), self.__link)
         return True
 
     async def __async_id(self):
-        self.__writer.write(f"ID|{self.__data['id']}".encode())
+        self.__writer.write(self.encode(f"ID|{self.__data['id']}"))
         await self.__writer.drain()
-        data = await self.__reader.read(3)
+        data = await self.decode(self.__reader)
         if data.decode() != "200":
             return False
         return True
@@ -112,6 +152,7 @@ class Client:
                 else:
                     print("Connection rejected")
                     os.remove(self.__link)
+                    self.__writer.write(self.encode(""))
                     self.__writer.close()
                     await self.__writer.wait_closed()
                     exit(1)
@@ -123,11 +164,13 @@ class Client:
                                                self.__async_receive()])
                 else:
                     print("Connection rejected")
+                    self.__writer.write(self.encode(""))
                     self.__writer.close()
                     await self.__writer.wait_closed()
                     exit(1)
         except KeyboardInterrupt:
             print("Bye!")
+            self.__writer.write(self.encode(""))
             self.__writer.close()
             await self.__writer.wait_closed()
             exit(0)
