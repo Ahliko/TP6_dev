@@ -38,7 +38,9 @@ class Server:
         print(f"data_header : {data_header}")
         len_header = self.unbinaire(data_header)
         print(f"len_header : {len_header}")
-        msg_len = self.unbinaire(await reader.read(len_header))
+        data_len = await reader.read(len_header)
+        print(f"data_len : {data_len}")
+        msg_len = self.unbinaire(data_len)
         print(f"msg_len : {msg_len}")
         chunks = []
 

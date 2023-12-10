@@ -97,7 +97,7 @@ class Client:
         while True:
             try:
                 data = await self.decode(self.__reader)
-                if data == b'':
+                if data == b'' or data is None:
                     print("Server disconnected")
                     self.__writer.close()
                     exit(0)
