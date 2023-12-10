@@ -55,8 +55,13 @@ class Client:
         return len_header + header + data.encode() + seq_fin
 
     async def decode(self, reader):
-        len_header = self.unbinaire(await reader.read(1))
-        msg_len = self.unbinaire(await reader.read(len_header))
+        data_header = await reader.read(1)
+        if data_header == b'<':
+            data_header += await reader.read(7)
+            data_header = await reader.read(1)
+        len_header = self.unbinaire(data_header)
+        data_len = await reader.read(len_header)
+        msg_len = self.unbinaire(data_len)
         chunks = []
 
         bytes_received = 0
