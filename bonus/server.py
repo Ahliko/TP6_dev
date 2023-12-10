@@ -42,7 +42,7 @@ class Server:
         while bytes_received < msg_len:
             # Si on reçoit + que la taille annoncée, on lit 1024 par 1024 octets
             chunk = await reader.read(min(msg_len - bytes_received,
-                                  1024))
+                                          1024))
             if not chunk:
                 raise RuntimeError('Invalid chunk received bro')
 
@@ -51,8 +51,8 @@ class Server:
 
             # on ajoute la quantité d'octets reçus au compteur
             bytes_received += len(chunk)
-            fin = await reader.read(8)
-            if fin.receive() != "<clafin>":
+            fin: bytes = await reader.read(8)
+            if fin.decode() != "<clafin>":
                 raise RuntimeError('Invalid chunk received bro')
             else:
                 # ptit one-liner pas combliqué à comprendre pour assembler la liste en un seul message
@@ -106,7 +106,7 @@ class Server:
                 return
         while True:
             data = await self.receive(self.__clients[id][
-                    "r"])
+                                          "r"])
             client = id
             if data == b'':
                 self.__clients[client]["here"] = False
@@ -138,17 +138,20 @@ class Server:
                             print(
                                 f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom")
                             self.__clients[client]["w"].write(
-                                self.encode(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom"))
+                                self.encode(
+                                    f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a quitté la chatroom"))
                             await self.__clients[client]["w"].drain()
                         elif reconnect:
                             print(
                                 f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} est de retour !")
                             self.__clients[client]["w"].write(
-                                self.encode(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} est de retour !"))
+                                self.encode(
+                                    f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} est de retour !"))
                             await self.__clients[client]["w"].drain()
                         else:
                             self.__clients[client]["w"].write(
-                                self.encode(f"{self.__clients[localclient]['timestamp']}\033{self.__clients[localclient]['color']}\033{self.__clients[localclient]['pseudo']}\033 a dit : {message}"))
+                                self.encode(
+                                    f"{self.__clients[localclient]['timestamp']}\033{self.__clients[localclient]['color']}\033{self.__clients[localclient]['pseudo']}\033 a dit : {message}"))
                             await self.__clients[client]["w"].drain()
                     else:
                         if not disconnect and not reconnect:
@@ -164,7 +167,8 @@ class Server:
                         f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom")
 
                     self.__clients[client]["w"].write(
-                        self.encode(f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom"))
+                        self.encode(
+                            f"[{datetime.datetime.today().hour}:{datetime.datetime.today().minute}]\033Annonce : {self.__clients[localclient]['pseudo']} a rejoint la chatroom"))
                     print(client)
                     await self.__clients[client]["w"].drain()
 

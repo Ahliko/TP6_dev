@@ -72,8 +72,8 @@ class Client:
 
             # on ajoute la quantité d'octets reçus au compteur
             bytes_received += len(chunk)
-            fin = await reader.read(8)
-            if fin.receive() != "<clafin>":
+            fin: bytes = await reader.read(8)
+            if fin.decode() != "<clafin>":
                 raise RuntimeError('Invalid chunk received bro')
             else:
                 # ptit one-liner pas combliqué à comprendre pour assembler la liste en un seul message
