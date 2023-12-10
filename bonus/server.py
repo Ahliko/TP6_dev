@@ -36,6 +36,10 @@ class Server:
     async def receive(self, reader):
         data_header = await reader.read(1)
         print(f"data_header : {data_header}")
+        if data_header == b'<':
+            data_header += await reader.read(7)
+            data_header = await reader.read(1)
+            print(f"data_header : {data_header}")
         len_header = self.unbinaire(data_header)
         print(f"len_header : {len_header}")
         data_len = await reader.read(len_header)
